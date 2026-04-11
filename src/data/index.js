@@ -14,10 +14,9 @@ export const siteData = {
     name: "Manthan Davra",
     title: "Software Developer & AI Enthusiast",
     taglines: [
-      "I build responsive web applications.",
-      "I create interactive user experiences.",
-      "I explore AI and machine learning.",
-      "I turn ideas into elegant code.",
+
+      "I explore AI and machine learning."
+
     ],
   },
   about: {

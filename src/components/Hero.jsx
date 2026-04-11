@@ -28,7 +28,7 @@ const Hero = () => {
           transition={{ duration: 0.5 }}
           className="text-primary font-mono mb-4 tracking-wider"
         >
-          Hi, my name is
+          Hello My Self
         </motion.p>
         
         <motion.h1

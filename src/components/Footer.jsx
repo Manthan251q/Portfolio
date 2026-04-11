@@ -11,9 +11,7 @@ const Footer = () => {
           <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
             MD
           </span>
-          <p className="text-text-muted mt-2 text-sm max-w-sm">
-            Building digital experiences that combine beautiful design with exceptional performance.
-          </p>
+
         </div>
 
         <div className="flex flex-col items-center md:items-end">
