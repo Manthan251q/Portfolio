@@ -8,14 +8,19 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import CustomCursor from './components/CustomCursor';
 import ScrollProgress from './components/ScrollProgress';
+import Background from './Background';
 
 function App() {
   return (
-    <div className="relative min-h-screen bg-dark text-text selection:bg-primary/30">
+    <div className="relative min-h-screen bg-transparent text-text selection:bg-primary/30">
+
+      {/* ✅ Background */}
+      <Background />
+
       <CustomCursor />
       <ScrollProgress />
       <Navbar />
-      
+
       <main>
         <Hero />
         <About />
