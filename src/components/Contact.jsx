@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Send, CheckCircle, AlertCircle } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 
 const Contact = () => {
+  const formRef = useRef();
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -12,8 +13,6 @@ const Contact = () => {
 
   // Initialize EmailJS on component mount
   useEffect(() => {
-    // Replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
-    // Get it from https://dashboard.emailjs.com/admin (Account > API Keys)
     emailjs.init('8pdXjSezNZ-wcuo1M');
   }, []);
 
@@ -57,20 +56,18 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Send email using EmailJS
-      // Replace 'YOUR_SERVICE_ID' and 'YOUR_TEMPLATE_ID' with your actual IDs
-      // Service ID: https://dashboard.emailjs.com/admin/services
-      // Template ID: https://dashboard.emailjs.com/admin/templates
+      // Send email using EmailJS with a simple approach
       await emailjs.send(
-        'service_q3c6juh',           // Service ID
-        'template_q3c6juh',          // Template ID
+        'service_q3c6juh',  // Your Service ID
         {
+          to_email: 'manthandavra90@gmail.com',
           from_name: formData.name,
           from_email: formData.email,
           subject: formData.subject,
           message: formData.message,
+          reply_to: formData.email,
         },
-        '8pdXjSezNZ-wcuo1M'            // Public Key
+        '8pdXjSezNZ-wcuo1M'  // Your Public Key
       );
 
       // Success state
@@ -82,9 +79,7 @@ const Contact = () => {
       setTimeout(() => setIsSubmitted(false), 5000);
     } catch (err) {
       console.error('EmailJS error:', err);
-      console.log('Error code:', err.status);
-      console.log('Error message:', err.text);
-      setError(`Failed to send message. Error: ${err.text || err.message || 'Unknown error'}`);
+      setError('Failed to send message. Please check your EmailJS setup.');
     } finally {
       setIsSubmitting(false);
     }
@@ -145,7 +140,7 @@ const Contact = () => {
               <p className="text-text-muted">Thanks for reaching out. I'll get back to you soon.</p>
             </motion.div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 relative z-10">
               {/* Error message display */}
               {error && (
                 <motion.div
