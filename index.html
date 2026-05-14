@@ -22,12 +22,300 @@
     .font-mono {
       font-family: 'JetBrains Mono', monospace;
     }
+
+    /* Loader Styles */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #0a0a0f;
+    }
+    body.loaded {
+      overflow: auto;
+    }
+
+    .loader-overlay {
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(ellipse at 50% 60%, #181824 60%, #0a0a0f 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 1.2s cubic-bezier(.77,0,.18,1), visibility 1.2s;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: all;
+    }
+    .loader-overlay.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .particles {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .loader-name {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 0.08em;
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+      filter: drop-shadow(0 0 18px #00ffe7cc) drop-shadow(0 0 32px #00ffe766);
+      user-select: none;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, #00ffe7 10%, #fff 50%, #00bfff 90%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .loader-letter {
+      opacity: 0;
+      transform: translateY(-80px) scale(0.8);
+      filter: blur(8px) brightness(1.5);
+      text-shadow:
+        0 0 12px #00ffe7cc,
+        0 0 24px #00ffe766,
+        0 0 40px #00ffe733;
+      animation: letterIn 0.8s cubic-bezier(.77,0,.18,1) forwards;
+    }
+    .loader-letter.glow {
+      text-shadow:
+        0 0 24px #00ffe7,
+        0 0 48px #00ffe7cc,
+        0 0 80px #00ffe7bb;
+      filter: blur(0) brightness(2);
+    }
+    @keyframes letterIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-80px) scale(0.8);
+        filter: blur(8px) brightness(1.5);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(10px) scale(1.08);
+        filter: blur(2px) brightness(1.2);
+      }
+      80% {
+        opacity: 1;
+        transform: translateY(-4px) scale(0.98);
+        filter: blur(0.5px) brightness(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0) brightness(1);
+      }
+    }
+
+    .shine {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      animation: shineSweep 1.2s 0.2s cubic-bezier(.77,0,.18,1) forwards;
+    }
+    @keyframes shineSweep {
+      0% { opacity: 0; left: -60%; }
+      10% { opacity: 0.7; }
+      50% { opacity: 1; left: 100%; }
+      100% { opacity: 0; left: 120%; }
+    }
+    .shine-gradient {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 0; width: 120%;
+      background: linear-gradient(120deg, transparent 0%, #fff 30%, #00ffe7 50%, #fff 70%, transparent 100%);
+      filter: blur(8px) brightness(2.5);
+      height: 100%;
+      opacity: 0.7;
+      transform: skewX(-20deg);
+    }
+
+    .loader-sub {
+      z-index: 2;
+      color: #b0f7ffcc;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      font-weight: 400;
+      margin-top: 0.5rem;
+      text-shadow: 0 0 8px #00ffe7aa;
+      opacity: 0.7;
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+    }
+
+    .loader-overlay.fade-out .loader-name,
+    .loader-overlay.fade-out .loader-sub {
+      transition: opacity 0.8s cubic-bezier(.77,0,.18,1);
+      opacity: 0;
+    }
+
+    .glass-bg {
+      position: absolute;
+      z-index: 1;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60vw; max-width: 700px; height: 30vh; max-height: 300px;
+      background: rgba(20, 30, 40, 0.22);
+      border-radius: 32px;
+      box-shadow: 0 8px 48px 0 #00ffe733, 0 1.5px 12px 0 #00ffe722;
+      backdrop-filter: blur(18px) saturate(1.5);
+      border: 1.5px solid rgba(0,255,231,0.12);
+      pointer-events: none;
+    }
+
+    #root {
+      opacity: 0;
+      transition: opacity 1.2s cubic-bezier(.77,0,.18,1);
+    }
+    #root.visible {
+      opacity: 1;
+    }
+
+    @media (max-width: 600px) {
+      .loader-name {
+        font-size: clamp(1.5rem, 10vw, 2.5rem);
+      }
+      .glass-bg {
+        width: 90vw;
+        height: 22vh;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <div class="loader-overlay" id="loader">
+    <div class="particles" id="particles"></div>
+    <div class="glass-bg"></div>
+    <div class="loader-name" id="loaderName"></div>
+    <div class="shine" id="shine">
+      <div class="shine-gradient"></div>
+    </div>
+    <div class="loader-sub">Welcome to my portfolio</div>
+  </div>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+  <script>
+    // Particle Background
+    const particleCount = window.innerWidth > 600 ? 48 : 18;
+    const particles = document.getElementById('particles');
+    for (let i = 0; i < particleCount; i++) {
+      const p = document.createElement('div');
+      const size = Math.random() * 2.5 + 1.5;
+      p.style.position = 'absolute';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = Math.random() * 100 + 'vh';
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.borderRadius = '50%';
+      p.style.background = 'radial-gradient(circle, #00ffe7cc 0%, #00ffe700 80%)';
+      p.style.opacity = Math.random() * 0.5 + 0.2;
+      p.style.filter = 'blur(' + (Math.random() * 2 + 1) + 'px)';
+      p.style.pointerEvents = 'none';
+      p.style.zIndex = 1;
+      particles.appendChild(p);
+
+      const duration = Math.random() * 8 + 7;
+      const delay = Math.random() * 4;
+      p.animate([
+        { transform: `translateY(0px) scale(1)` },
+        { transform: `translateY(${Math.random() * 60 - 30}px) scale(${Math.random() * 0.7 + 0.7})` },
+        { transform: `translateY(0px) scale(1)` }
+      ], {
+        duration: duration * 1000,
+        delay: delay * 1000,
+        iterations: Infinity,
+        direction: 'alternate',
+        easing: 'cubic-bezier(.77,0,.18,1)'
+      });
+    }
+
+    // Name Animation
+    const name = "Manthan Davra";
+    const loaderName = document.getElementById('loaderName');
+    loaderName.innerHTML = '';
+    let delay = 0;
+    const letters = [];
+    for (let i = 0; i < name.length; i++) {
+      const span = document.createElement('span');
+      span.textContent = name[i] === ' ' ? '\u00A0' : name[i];
+      span.className = 'loader-letter';
+      span.style.animationDelay = (delay).toFixed(2) + 's';
+      loaderName.appendChild(span);
+      letters.push(span);
+      delay += name[i] === ' ' ? 0.08 : 0.11;
+    }
+
+    // Neon glow and blur-to-clear
+    setTimeout(() => {
+      letters.forEach((span, idx) => {
+        setTimeout(() => {
+          span.classList.add('glow');
+          setTimeout(() => {
+            span.classList.remove('glow');
+          }, 400);
+        }, idx * 110 + 400);
+      });
+    }, 200);
+
+    // Shine animation
+    const shine = document.getElementById('shine');
+    setTimeout(() => {
+      shine.style.opacity = '1';
+      shine.style.left = '-60%';
+      shine.classList.add('active');
+      shine.children[0].style.animation = 'shineSweep 1.2s cubic-bezier(.77,0,.18,1)';
+      setTimeout(() => {
+        shine.style.opacity = '0';
+      }, 1200);
+    }, delay * 1000 + 400);
+
+    // Loader fade out and reveal content
+    const loader = document.getElementById('loader');
+    const root = document.getElementById('root');
+    setTimeout(() => {
+      loader.classList.add('fade-out');
+      setTimeout(() => {
+        loader.style.display = 'none';
+        root.classList.add('visible');
+        document.body.classList.add('loaded');
+      }, 1200);
+    }, Math.max(3400, delay * 1000 + 1800));
+
+    // Prevent scrolling while loader is active
+    document.body.style.overflow = 'hidden';
+
+    // Pulse glow effect
+    setTimeout(() => {
+      loaderName.animate([
+        { filter: 'drop-shadow(0 0 18px #00ffe7cc) drop-shadow(0 0 32px #00ffe766)' },
+        { filter: 'drop-shadow(0 0 38px #00ffe7) drop-shadow(0 0 64px #00ffe7cc)' },
+        { filter: 'drop-shadow(0 0 18px #00ffe7cc) drop-shadow(0 0 32px #00ffe766)' }
+      ], {
+        duration: 1200,
+        iterations: 2,
+        easing: 'ease-in-out'
+      });
+    }, delay * 1000 + 1200);
+  </script>
 </body>
 
 </html>

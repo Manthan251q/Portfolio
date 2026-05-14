@@ -25,9 +25,9 @@ export default function Background() {
 
         for (let i = 0; i < 3000; i++) {
             vertices.push(
-                (Math.random() - 0.5) * 10,
-                (Math.random() - 0.5) * 10,
-                (Math.random() - 0.5) * 10
+                (Math.random() - 0.2) * 10,
+                (Math.random() - 0.2) * 10,
+                (Math.random() - 0.2) * 10
             );
         }
 
@@ -47,8 +47,8 @@ export default function Background() {
         const mouse = { x: 0, y: 0 };
 
         const handleMouseMove = (e) => {
-            mouse.x = e.clientX / window.innerWidth - 0.5;
-            mouse.y = e.clientY / window.innerHeight - 0.5;
+            mouse.x = e.clientX / window.innerWidth - 0.2;
+            mouse.y = e.clientY / window.innerHeight - 0.2;
         };
 
         window.addEventListener("mousemove", handleMouseMove);
@@ -57,8 +57,8 @@ export default function Background() {
             requestAnimationFrame(animate);
 
             particles.rotation.y += 0.001;
-            particles.rotation.x += mouse.y * 0.02;
-            particles.rotation.y += mouse.x * 0.02;
+            particles.rotation.x += mouse.y * 0.002;
+            particles.rotation.y += mouse.x * 0.002;
 
             renderer.render(scene, camera);
         };
