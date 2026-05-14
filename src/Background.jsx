@@ -57,8 +57,8 @@ export default function Background() {
             requestAnimationFrame(animate);
 
             particles.rotation.y += 0.001;
-            particles.rotation.x += mouse.y * 0.05;
-            particles.rotation.y += mouse.x * 0.05;
+            particles.rotation.x += mouse.y * 0.02;
+            particles.rotation.y += mouse.x * 0.02;
 
             renderer.render(scene, camera);
         };

@@ -1,29 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, CheckCircle } from 'lucide-react';
+import { Send, CheckCircle, AlertCircle } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // Initialize EmailJS on component mount
+  useEffect(() => {
+    // Replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
+    // Get it from https://dashboard.emailjs.com/admin (Account > API Keys)
+    emailjs.init('YOUR_PUBLIC_KEY');
+  }, []);
+
+  // Form validation
+  const validateForm = () => {
+    const errors = {};
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
+    }
+    
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.subject.trim()) {
+      errors.subject = 'Subject is required';
+    }
+    
+    if (!formData.message.trim()) {
+      errors.message = 'Message is required';
+    } else if (formData.message.trim().length < 10) {
+      errors.message = 'Message must be at least 10 characters';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validate form before submitting
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Send email using EmailJS
+      // Replace 'YOUR_SERVICE_ID' and 'YOUR_TEMPLATE_ID' with your actual IDs
+      // Service ID: https://dashboard.emailjs.com/admin/services
+      // Template ID: https://dashboard.emailjs.com/admin/templates
+      await emailjs.send(
+        'YOUR_SERVICE_ID',           // Service ID
+        'YOUR_TEMPLATE_ID',          // Template ID
+        {
+          to_email: 'YOUR_EMAIL@gmail.com', // Your Gmail address (recipient)
+          from_name: formData.name,
+          from_email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
+        'YOUR_PUBLIC_KEY'            // Public Key
+      );
+
+      // Success state
       setIsSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
-      
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setValidationErrors({});
+
       // Reset success message after 5 seconds
       setTimeout(() => setIsSubmitted(false), 5000);
-    }, 1500);
+    } catch (err) {
+      console.error('EmailJS error:', err);
+      setError('Failed to send message. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors({ ...validationErrors, [name]: '' });
+    }
   };
 
   return (
@@ -73,47 +145,105 @@ const Contact = () => {
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+              {/* Error message display */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-lg"
+                >
+                  <AlertCircle size={20} className="text-red-400 flex-shrink-0" />
+                  <p className="text-red-300">{error}</p>
+                </motion.div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-text-muted mb-2">Name</label>
+                  <label htmlFor="name" className="block text-sm font-medium text-text-muted mb-2">
+                    Name {validationErrors.name && <span className="text-red-400">*</span>}
+                  </label>
                   <input
                     type="text"
                     id="name"
                     name="name"
-                    required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-3 text-text placeholder-text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                    className={`w-full bg-dark/50 border rounded-lg px-4 py-3 text-text placeholder-text-muted/50 focus:outline-none focus:ring-2 transition-all ${
+                      validationErrors.name
+                        ? 'border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50'
+                        : 'border-white/10 focus:ring-primary/50 focus:border-primary/50'
+                    }`}
                     placeholder="John Doe"
                   />
+                  {validationErrors.name && (
+                    <p className="text-red-400 text-sm mt-1">{validationErrors.name}</p>
+                  )}
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-text-muted mb-2">Email</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-text-muted mb-2">
+                    Email {validationErrors.email && <span className="text-red-400">*</span>}
+                  </label>
                   <input
                     type="email"
                     id="email"
                     name="email"
-                    required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-3 text-text placeholder-text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                    className={`w-full bg-dark/50 border rounded-lg px-4 py-3 text-text placeholder-text-muted/50 focus:outline-none focus:ring-2 transition-all ${
+                      validationErrors.email
+                        ? 'border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50'
+                        : 'border-white/10 focus:ring-primary/50 focus:border-primary/50'
+                    }`}
                     placeholder="john@example.com"
                   />
+                  {validationErrors.email && (
+                    <p className="text-red-400 text-sm mt-1">{validationErrors.email}</p>
+                  )}
                 </div>
+              </div>
+
+              <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-text-muted mb-2">
+                  Subject {validationErrors.subject && <span className="text-red-400">*</span>}
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className={`w-full bg-dark/50 border rounded-lg px-4 py-3 text-text placeholder-text-muted/50 focus:outline-none focus:ring-2 transition-all ${
+                    validationErrors.subject
+                      ? 'border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50'
+                      : 'border-white/10 focus:ring-primary/50 focus:border-primary/50'
+                  }`}
+                  placeholder="What is this about?"
+                />
+                {validationErrors.subject && (
+                  <p className="text-red-400 text-sm mt-1">{validationErrors.subject}</p>
+                )}
               </div>
               
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-text-muted mb-2">Message</label>
+                <label htmlFor="message" className="block text-sm font-medium text-text-muted mb-2">
+                  Message {validationErrors.message && <span className="text-red-400">*</span>}
+                </label>
                 <textarea
                   id="message"
                   name="message"
-                  required
                   rows="5"
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full bg-dark/50 border border-white/10 rounded-lg px-4 py-3 text-text placeholder-text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all resize-none"
+                  className={`w-full bg-dark/50 border rounded-lg px-4 py-3 text-text placeholder-text-muted/50 focus:outline-none focus:ring-2 transition-all resize-none ${
+                    validationErrors.message
+                      ? 'border-red-500/50 focus:ring-red-500/30 focus:border-red-500/50'
+                      : 'border-white/10 focus:ring-primary/50 focus:border-primary/50'
+                  }`}
                   placeholder="Hello, I'd like to talk about..."
                 />
+                {validationErrors.message && (
+                  <p className="text-red-400 text-sm mt-1">{validationErrors.message}</p>
+                )}
               </div>
 
               <div className="flex justify-center mt-8">
