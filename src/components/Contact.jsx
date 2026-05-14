@@ -82,7 +82,9 @@ const Contact = () => {
       setTimeout(() => setIsSubmitted(false), 5000);
     } catch (err) {
       console.error('EmailJS error:', err);
-      setError('Failed to send message. Please try again later.');
+      console.log('Error code:', err.status);
+      console.log('Error message:', err.text);
+      setError(`Failed to send message. Error: ${err.text || err.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
