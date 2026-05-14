@@ -14,7 +14,7 @@ const Contact = () => {
   useEffect(() => {
     // Replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
     // Get it from https://dashboard.emailjs.com/admin (Account > API Keys)
-    emailjs.init('YOUR_PUBLIC_KEY');
+    emailjs.init('8pdXjSezNZ-wcuo1M');
   }, []);
 
   // Form validation
@@ -62,16 +62,15 @@ const Contact = () => {
       // Service ID: https://dashboard.emailjs.com/admin/services
       // Template ID: https://dashboard.emailjs.com/admin/templates
       await emailjs.send(
-        'YOUR_SERVICE_ID',           // Service ID
-        'YOUR_TEMPLATE_ID',          // Template ID
+        'service_q3c6juh',           // Service ID
+        'template_q3c6juh',          // Template ID
         {
-          to_email: 'YOUR_EMAIL@gmail.com', // Your Gmail address (recipient)
           from_name: formData.name,
           from_email: formData.email,
           subject: formData.subject,
           message: formData.message,
         },
-        'YOUR_PUBLIC_KEY'            // Public Key
+        '8pdXjSezNZ-wcuo1M'            // Public Key
       );
 
       // Success state
