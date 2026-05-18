@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #eab308;
+  --color-primary-dark: #ca8a04;
+  --color-accent: #fcd34d;
+  --color-dark: #09090b;
+  --color-dark-light: #18181b;
+  --color-dark-lighter: #27272a;
+  --color-text: #fafafa;
+  --color-text-muted: #a1a1aa;
+
+  --animate-blob: blob 7s infinite;
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@layer base {
+  body {
+    @apply bg-dark text-text antialiased selection:bg-primary/30;
+  }
+}
+
+@layer utilities {
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  
+  .glass {
+    @apply bg-dark-light/50 backdrop-blur-md border border-white/10;
+  }
+  .glass-card {
+    @apply bg-dark-lighter/40 backdrop-blur-lg border border-white/5 shadow-xl;
+  }
+}
